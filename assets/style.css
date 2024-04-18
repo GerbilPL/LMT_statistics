@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+:root{
+    --ibm-black: #000000;
+    --ibm-white: #ffffff;
+    --ibm-blue-80: #002d9c;
+    --ibm-gray-10: #f4f4f4;
+}
+
+*{
+    font-family: "IBM Plex Sans", sans-serif !important;
+}
+html,body, .dash-graph{
+    background-color: var(--ibm-gray-10);
+}
+.card-container{
+    width: 100%;
+
+    display: flex;
+    flex-wrap: wrap;
+}
+.card-body{
+    width: fit-content;
+    padding: px;
+    margin: 15px;
+}
+.card-title{
+    margin: 0;
+    padding: 10px;
+
+    background-color: var(--ibm-black);
+    color: var(--ibm-white);
+
+    border: 1px solid var(--ibm-black);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.card-text{
+    padding: 10px;
+    margin: 0;
+
+    font-weight: 800;
+    font-size: 1.3rem;
+    
+    background-color: var(--ibm-white);
+    color: var(--ibm-blue-80);
+
+    border: 1px solid var(--ibm-black);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
