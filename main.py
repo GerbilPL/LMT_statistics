@@ -189,7 +189,7 @@ class LMT_Statistics:
         """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
         os_totals = _df[os_columns].sum(axis=0).sort_values(ascending=False)
-        os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize() for col in os_columns]
+        os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_totals.axes[0]]
         return os_totals, os_labels
 
     def get_endpoints_per_os(self,_df:pd.DataFrame)->tuple:
@@ -203,7 +203,7 @@ class LMT_Statistics:
         """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
         os_avgs = _df[os_columns].mean(axis=0).round(2).sort_values(ascending=False)
-        os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize() for col in os_columns]
+        os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_avgs.axes[0]]
         return os_avgs, os_labels
 
     def get_avg_instance_per_endpoints(self,_df:pd.DataFrame)->float:
@@ -372,6 +372,6 @@ class LMT_Statistics:
 
 
 if __name__ == '__main__':
-    lmt = LMT_Statistics("example.csv")
+    lmt = LMT_Statistics("history.csv")
     lmt.init(return_to_self=True)
     lmt.run_server(_debug=True)
