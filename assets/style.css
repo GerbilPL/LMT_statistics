@@ -15,9 +15,9 @@ html,body, .dash-graph{
 }
 .card-container{
     width: 100%;
-
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 }
 .card-body{
     width: fit-content;
@@ -28,6 +28,8 @@ html,body, .dash-graph{
     margin: 0;
     padding: 10px;
 
+    font-size: 1.5rem;
+
     background-color: var(--ibm-black);
     color: var(--ibm-white);
 
@@ -36,11 +38,13 @@ html,body, .dash-graph{
     border-top-right-radius: 10px;
 }
 .card-text{
+    display: block;
+
     padding: 10px;
     margin: 0;
 
     font-weight: 800;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     
     background-color: var(--ibm-white);
     color: var(--ibm-blue-80);
@@ -48,4 +52,10 @@ html,body, .dash-graph{
     border: 1px solid var(--ibm-black);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+h1{
+    font-size: 3rem;
+}
+h2{
+    font-size: 2rem;
 }

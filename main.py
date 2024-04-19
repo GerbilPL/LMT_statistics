@@ -128,7 +128,7 @@ class LMT_Statistics:
         :rtype: html.Div
         """
         div = html.Div([
-            html.Div([html.H3([l], className="card-title"), html.Pre([str(d)], className="card-text")]
+            html.Div([html.H3([l], className="card-title"), html.Span([str(d)], className="card-text")]
                     ,className="card-body")
                     for l, d in zip(_labels, _data)
             ], className="card-container")
@@ -372,6 +372,6 @@ class LMT_Statistics:
 
 
 if __name__ == '__main__':
-    lmt = LMT_Statistics("history.csv")
+    lmt = LMT_Statistics("example.csv")
     lmt.init(return_to_self=True)
     lmt.run_server(_debug=True)
