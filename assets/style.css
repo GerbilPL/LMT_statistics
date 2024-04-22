@@ -52,6 +52,7 @@ html,body, .dash-graph{
     border: 1px solid var(--ibm-black);
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
+    text-align: center;
 }
 h1{
     font-size: 3rem;
