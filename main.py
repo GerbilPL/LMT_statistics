@@ -61,7 +61,7 @@ class LMT_Statistics:
         
         return tick_values, tick_labels
 
-    def bar_chart(self,_df:pd.DataFrame, _title:str,logarithmic_y_axis:bool, _x:list, _y:list,_labels:dict={}, tick_values:list=[], tick_labels:list=[], traces:list=[], layout_hovermode:str="x", layout_hoverlabel:dict={},layout_legend:dict={},html_id:str='')->html.Div:
+    def bar_chart(self,_df:pd.DataFrame, _title:str,logarithmic_y_axis:bool, _x:list, _y:list,_labels:dict={}, tick_values:list=[], tick_labels:list=[], traces:list=[], layout_hovermode:str="x", layout_hoverlabel:dict={},layout_legend:dict={},html_id:str='',_text_auto=False)->html.Div:
         """
         Generates a div with a bar chart based on specified parameters
 
@@ -96,7 +96,7 @@ class LMT_Statistics:
         """
         graph = dcc.Graph(
             figure=(
-                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels)
+                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels)
             )
             .update_yaxes(tickvals=tick_values, ticktext=tick_labels)
             .update_traces(traces)
@@ -202,7 +202,7 @@ class LMT_Statistics:
         :rtype: tuple
         """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
-        os_avgs = _df[os_columns].mean(axis=0).round(2).sort_values(ascending=False)
+        os_avgs = _df[os_columns].mean(axis=0).round(3).sort_values(ascending=False)
         os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_avgs.axes[0]]
         return os_avgs, os_labels
 
@@ -321,7 +321,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto=''
             ),
             
             html.H2("Average number of endpoints per OS"),
@@ -332,7 +332,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f'
             ),
 
             self.card([
@@ -368,7 +368,7 @@ class LMT_Statistics:
             app.layout = self.web_layout
             app.run_server(debug=_debug)
         else:
-            raise Exception("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
+            raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
 
 
 if __name__ == '__main__':
