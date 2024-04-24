@@ -234,7 +234,7 @@ class LMT_Statistics:
         return avg
 
 
-    def init(self,return_to_self:bool=False)->html.Div:
+    def make_graphs(self,return_to_self:bool=False)->html.Div:
         """
         Initializes and computes data based on specified csv file. Returns either a dash.html.Div layout or sets up layout for default web server (LMT.web_layout and LMT.run_server()).
         Call before LMT_Statistics.run_server() method.
@@ -347,8 +347,7 @@ class LMT_Statistics:
         if(return_to_self):
             self.web_layout = layout
             return html.Div()
-        else:
-            return layout
+        return layout
 
 
     def run_server(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
@@ -373,5 +372,5 @@ class LMT_Statistics:
 
 if __name__ == '__main__':
     lmt = LMT_Statistics("example.csv")
-    lmt.init(return_to_self=True)
+    lmt.make_graphs(return_to_self=True)
     lmt.run_server(_debug=True)
