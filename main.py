@@ -1,6 +1,7 @@
-from dash import dash, dcc, html, dash_table
+from dash import dash, dcc, html, dash_table, Input, Output, callback
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 class LMT_Statistics:
     def __init__(self,
@@ -348,7 +349,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto=''
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='',html_id='graph-os-endpoint-breakdown'
             ),
             
             html.H2("Average number of endpoints per OS"),
@@ -359,7 +360,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f'
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f',html_id='graph-endpoints-per-os-avg'
             ),
 
             self.card([
