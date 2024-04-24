@@ -1,4 +1,4 @@
-from dash import dash, dcc, html
+from dash import dash, dcc, html, dash_table
 import pandas as pd
 import plotly.express as px
 
@@ -96,7 +96,7 @@ class LMT_Statistics:
         """
         graph = dcc.Graph(
             figure=(
-                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels)
+                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
             )
             .update_yaxes(tickvals=tick_values, ticktext=tick_labels)
             .update_traces(traces)
@@ -106,7 +106,7 @@ class LMT_Statistics:
                 font=dict(family=self.font_family, size=self.font_size, color="black"),
                 hovermode=layout_hovermode,
                 hoverlabel=layout_hoverlabel,
-                legend=layout_legend,
+                legend=layout_legend
             )
         ) 
         if html_id != '':
@@ -114,6 +114,31 @@ class LMT_Statistics:
         div = html.Div([
             graph,
         ])
+        return div
+    
+
+    def dataTable(self,_df:pd.DataFrame)->html.Div:
+        """
+        Generates a div with a dataTable based on specified parameters
+
+        :param _df: DataFrame
+        :return: A Dash HTML div containing the dataTable
+        :rtype: html.Div
+        """
+        div = html.Div([
+            dash_table.DataTable(
+                id='datatable-interactivity',
+                columns=[
+                    {"name": i, "id": i} for i in _df.columns
+                ],
+                data=_df.to_dict('records'),
+                sort_action="native",
+                sort_mode="multi",
+                page_action="native",
+                page_current=0,
+                page_size=10,
+                style_table={'overflowX': 'scroll'},
+            )])
         return div
 
     def card(self,_data:list,_labels:list)->html.Div:
@@ -293,6 +318,8 @@ class LMT_Statistics:
         layout = html.Div([
             
             html.H1(["LMT Statistics"," — ","Dashboard"],style={"textAlign": "center"}),
+
+            self.dataTable(data),
 
             html.H2("Disconnected Endpoints Over Time"),
             self.bar_chart(
