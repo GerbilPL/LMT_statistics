@@ -1,6 +1,7 @@
-from dash import dash, dcc, html
+from dash import dash, dcc, html, dash_table, Input, Output, callback
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 class LMT_Statistics:
     def __init__(self,
@@ -61,7 +62,7 @@ class LMT_Statistics:
         
         return tick_values, tick_labels
 
-    def bar_chart(self,_df:pd.DataFrame, _title:str,logarithmic_y_axis:bool, _x:list, _y:list,_labels:dict={}, tick_values:list=[], tick_labels:list=[], traces:list=[], layout_hovermode:str="x", layout_hoverlabel:dict={},layout_legend:dict={},html_id:str='')->html.Div:
+    def bar_chart(self,_df:pd.DataFrame, _title:str,logarithmic_y_axis:bool, _x:list, _y:list,_labels:dict={}, tick_values:list=[], tick_labels:list=[], traces:list=[], layout_hovermode:str="x", layout_hoverlabel:dict={},layout_legend:dict={},html_id:str='',_text_auto=False)->html.Div:
         """
         Generates a div with a bar chart based on specified parameters
 
@@ -96,7 +97,7 @@ class LMT_Statistics:
         """
         graph = dcc.Graph(
             figure=(
-                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels)
+                px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
             )
             .update_yaxes(tickvals=tick_values, ticktext=tick_labels)
             .update_traces(traces)
@@ -106,7 +107,7 @@ class LMT_Statistics:
                 font=dict(family=self.font_family, size=self.font_size, color="black"),
                 hovermode=layout_hovermode,
                 hoverlabel=layout_hoverlabel,
-                legend=layout_legend,
+                legend=layout_legend
             )
         ) 
         if html_id != '':
@@ -114,6 +115,31 @@ class LMT_Statistics:
         div = html.Div([
             graph,
         ])
+        return div
+    
+
+    def dataTable(self,_df:pd.DataFrame)->html.Div:
+        """
+        Generates a div with a dataTable based on specified parameters
+
+        :param _df: DataFrame
+        :return: A Dash HTML div containing the dataTable
+        :rtype: html.Div
+        """
+        div = html.Div([
+            dash_table.DataTable(
+                id='datatable-interactivity',
+                columns=[
+                    {"name": i, "id": i} for i in _df.columns
+                ],
+                data=_df.to_dict('records'),
+                sort_action="native",
+                sort_mode="multi",
+                page_action="native",
+                page_current=0,
+                page_size=10,
+                style_table={'overflowX': 'scroll'},
+            )])
         return div
 
     def card(self,_data:list,_labels:list)->html.Div:
@@ -202,7 +228,7 @@ class LMT_Statistics:
         :rtype: tuple
         """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
-        os_avgs = _df[os_columns].mean(axis=0).round(2).sort_values(ascending=False)
+        os_avgs = _df[os_columns].mean(axis=0).round(3).sort_values(ascending=False)
         os_labels = [col.replace('endpoints_os_', '').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_avgs.axes[0]]
         return os_avgs, os_labels
 
@@ -234,7 +260,7 @@ class LMT_Statistics:
         return avg
 
 
-    def init(self,return_to_self:bool=False)->html.Div:
+    def make_graphs(self,return_to_self:bool=False)->html.Div:
         """
         Initializes and computes data based on specified csv file. Returns either a dash.html.Div layout or sets up layout for default web server (LMT.web_layout and LMT.run_server()).
         Call before LMT_Statistics.run_server() method.
@@ -294,6 +320,8 @@ class LMT_Statistics:
             
             html.H1(["LMT Statistics"," — ","Dashboard"],style={"textAlign": "center"}),
 
+            self.dataTable(data),
+
             html.H2("Disconnected Endpoints Over Time"),
             self.bar_chart(
                 disconnected_endpoints_over_time,
@@ -321,7 +349,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='',html_id='graph-os-endpoint-breakdown'
             ),
             
             html.H2("Average number of endpoints per OS"),
@@ -332,7 +360,7 @@ class LMT_Statistics:
                 "", True, 'OS', 'Endpoints',
                 {'index': 'OS', 'y': 'Endpoints'},
                 endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend
+                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f',html_id='graph-endpoints-per-os-avg'
             ),
 
             self.card([
@@ -347,8 +375,7 @@ class LMT_Statistics:
         if(return_to_self):
             self.web_layout = layout
             return html.Div()
-        else:
-            return layout
+        return layout
 
 
     def run_server(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
@@ -368,10 +395,10 @@ class LMT_Statistics:
             app.layout = self.web_layout
             app.run_server(debug=_debug)
         else:
-            raise Exception("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
+            raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
 
 
 if __name__ == '__main__':
     lmt = LMT_Statistics("example.csv")
-    lmt.init(return_to_self=True)
+    lmt.make_graphs(return_to_self=True)
     lmt.run_server(_debug=True)
