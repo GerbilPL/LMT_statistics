@@ -214,6 +214,7 @@ h2{
 
 .full-screen{
     background-color: var(--secondary-color);
+    /* background-image: url(assets/ibm_bg.jpg); */
     height: 100vh;
     display: flex;
     justify-content: center;
