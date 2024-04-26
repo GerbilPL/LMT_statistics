@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash_daq as daq
 
+
 class LMT_Statistics:
     def __init__(self,
                  statistic_file: str,
@@ -603,6 +604,7 @@ class LMT_Statistics:
                 className="full-screen",
                 id="top",
                 children=[
+                    # html.Img(src=("ibm_bg.jpg")),
                     html.H1("IBM Dashboard"),
                     html.A(html.Button("More", className="btn"), href="#first")
                 ]
