@@ -731,18 +731,27 @@ class LMT_Statistics:
         if graph_type == 0:
             os_breakdown, _ = self.get_os_breakdown(data)
             filtered_data = os_breakdown[selected_columns]
-            filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_breakdown.axes[0]]
+            filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
                     'OS': filtered_data.axes[0], 
                     'Endpoints': filtered_data})
         else:
             os_breakdown, _ = self.get_endpoints_per_os(data)
             filtered_data = os_breakdown[selected_columns]
-            filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in os_breakdown.axes[0]]
+            filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
                     'OS': filtered_data.axes[0], 
                     'Endpoints': filtered_data})
-        fig = px.bar(dt,x='OS',y='Endpoints',text_auto='.3f',)
+        # print(filtered_data_labels,filtered_data.axes[0])
+        labels = {}
+        for key in filtered_data.axes[0]:
+            for value in filtered_data_labels:
+                labels[key]=value
+                filtered_data_labels.remove(value)
+                break
+        # print(labels)
+
+        fig = px.bar(dt,x='OS',y='Endpoints')
         fig.update_layout(
             hoverlabel=dict(
                 bgcolor="white",
@@ -762,10 +771,11 @@ class LMT_Statistics:
             yaxis_type='log',
             height=600,
         )
-        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y:.3f}</b><extra></extra>')
+        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y}</b><extra></extra>')
         return fig
     
     def update_title(self, hdata):
+        # print(hdata)
         data = self.import_data()
         os_breakdown, _ = self.get_os_breakdown(data)
         if hdata is not None:
@@ -781,14 +791,14 @@ class LMT_Statistics:
             Input('breakdown-checklist', 'value')
         )
         def update_graph(selected_columns,graph_type=0):
-            return self.update_graph(selected_columns)
+            return self.update_graph(selected_columns,graph_type)
         
         @callback(
             Output('graph-endpoints-per-os-avg', 'figure'),
             Input('average-checklist', 'value')
         )
         def update_graph(selected_columns,graph_type=1):
-            return self.update_graph(selected_columns)
+            return self.update_graph(selected_columns,graph_type)
 
         @callback(
             Output('graph-os-endpoint-breakdown-title', 'children'),
@@ -831,4 +841,4 @@ class LMT_Statistics:
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=True)
+    lmt.run_server(_debug=False)
