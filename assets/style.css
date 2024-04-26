@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
 
-:root{
+/* :root{
     --ibm-black: #000000;
     --ibm-white: #ffffff;
     --ibm-blue-80: #002d9c;
@@ -59,4 +59,285 @@ h1{
 }
 h2{
     font-size: 2rem;
+}
+
+#datatable-interactivity{
+    width: 75%;
+    margin: 0 auto;
+} */
+
+/*----------------------------------------------------------------------------*/
+
+:root{
+    --ibm-black: #000000;
+    --ibm-white: #ffffff;
+    --ibm-blue-80: #002d9c;
+    --ibm-gray-10: #f4f4f4;
+    --primary-color: #0f62fe;
+    --secondary-color: #82cfff;
+    --background-color: #e5f6ff;
+    --text-color: var(--ibm-black);
+}
+
+*{
+    font-family: "IBM Plex Sans", sans-serif !important;
+    box-sizing: border-box;
+}
+
+html, body{
+    background-color: white;
+    /* background-color: var(--background-color); */
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+.card-container{
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.card-body{
+    width: fit-content;
+    padding: px;
+    margin: 15px;
+    width: 605px;
+}
+.card-title{
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+
+    font-size: 1.5rem;
+
+    background-color: var(--ibm-black);
+    color: var(--ibm-white);
+
+    border: 1px solid var(--ibm-black);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.card-text{
+    display: block;
+
+    padding: 10px;
+    margin: 0;
+
+    font-weight: 800;
+    font-size: 1.5rem;
+    
+    background-color: var(--ibm-white);
+    color: var(--ibm-blue-80);
+
+    border: 1px solid var(--ibm-black);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    text-align: center;
+}
+
+h1{
+    font-size: 3rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+h2{
+    font-size: 2rem;
+    color: var(--text-color);
+    text-align: center;
+}
+
+#datatable-interactivity{
+    width: 80%;
+    margin: 0 auto;
+    background-color: var(--ibm-white);
+    border-radius: 25px;
+    padding: 15px;
+}
+
+#datatable-interactivity th, #datatable-interactivity td{
+    padding: 8px;
+    text-align: center;
+}
+
+#datatable-interactivity td{
+    background-color: var(--ibm-white);
+    color: var(--text-color);
+}
+
+#graph-database-type-over-time, #graph-endpoints-over-time{
+    /* background-color: var(--secondary-color); */
+    width: 80%;
+    margin: 50px auto;
+}
+
+.main-svg{
+    border-radius: 25px;
+}
+
+#toggle-switch{
+    width: 12.5%;
+    justify-content: center;
+    text-align: center;
+    margin: 20px auto -25px auto;
+}
+
+#graph-os-endpoint-breakdown{
+    width: 80%;
+    margin: auto;
+}
+
+#graph-endpoints-per-os-avg{
+    width: 80%;
+    margin: auto;
+}
+
+#breakdown-checklist, #average-checklist{
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+
+#breakdown-checklist *{
+    margin: 2.5px;
+}
+
+#average-checklist *{
+    margin: 2.5px;
+}
+
+#first{
+    margin: 0;
+    padding: 0;
+}
+
+.full-screen{
+    /* background-color: var(--secondary-color); */
+    background-image: url("ibm_bg.jpg");
+    background-position: 0;
+    /* background-repeat: no-repeat; */
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: #fff;
+}
+
+/* .full-screen img{
+    width: 100%;
+    max-height: 100vh;
+} */
+
+.content{
+    max-width: 800px;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.btn{
+    padding: 10px 20px;
+    /* background-color: #fff; */
+    background-color: var(--ibm-blue-80);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    margin-top: 1000px;
+}
+  
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--background-color);
+    /* background-color: var(--primary-color); */
+    padding: 20px;
+    margin-bottom: 50px;
+    position: sticky;
+}
+  
+.logo{
+    color: black;
+    /* color: white; */
+    font-size: 24px;
+}
+  
+.nav-links{
+    list-style-type: none;
+    display: flex;
+}
+  
+.nav-links li{
+    margin-right: 20px;
+}
+  
+.nav-links li a{
+    color: black;
+    /* color: white; */
+    text-decoration: none;
+}
+
+.nav-links li a:hover{
+    text-decoration: underline;
+}
+  
+.burger{
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+  
+.line1, .line2, .line3{
+    width: 25px;
+    height: 3px;
+    background-color: black;
+    /* background-color: white; */
+    margin: 4px;
+}
+  
+@media screen and (max-width: 943px){
+    .nav-links{
+        display: none;
+    }
+    
+    .burger{
+        display: flex;
+    }
+}
+
+.goto-top{
+    position: fixed;
+    bottom: 10px;
+    left: 20px;
+    min-height: 10px;
+    width: 35px;
+    text-align: center;
+    
+    
+}
+
+.goto-top a{
+    display: block;
+    padding: 10px;
+    background-color: var(--background-color);
+    color: #333;
+    text-decoration: none;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar{
+    width: 10px;
+}
+
+::-webkit-scrollbar-thumb{
+    background: lightgray; 
+    border-radius: 10px;
+}
+  
+::-webkit-scrollbar-thumb:hover{
+    background: rgb(186, 185, 185);
 }
