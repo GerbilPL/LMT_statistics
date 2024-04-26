@@ -604,8 +604,8 @@ class LMT_Statistics:
                 className="full-screen",
                 id="top",
                 children=[
-                    # html.Img(src=("ibm_bg.jpg")),
-                    html.H1("IBM Dashboard"),
+                    # html.Img(src=("assets/ibm_bg.jpg")),
+                    # html.H1("IBM Dashboard"),
                     html.A(html.Button("More", className="btn"), href="#first")
                 ]
             ),
@@ -823,7 +823,7 @@ class LMT_Statistics:
         if hasattr(self, 'web_layout'):
             app = dash.Dash(name=_name, title="LMT Statistics", assets_folder=assets_folder)
             app.layout = self.web_layout
-            app.run_server(debug=_debug)
+            app.run_server(port=8080, debug=_debug)
         else:
             raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
 
