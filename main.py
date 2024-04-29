@@ -841,4 +841,4 @@ class LMT_Statistics:
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=False)
+    lmt.run_server(_debug=True)
