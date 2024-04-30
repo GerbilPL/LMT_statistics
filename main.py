@@ -783,10 +783,10 @@ class LMT_Statistics:
     def update_title(self, hdata):
         data = self.import_data()
         os_breakdown, _ = self.get_os_breakdown(data)
-        print(os_breakdown.index)
+        # print(os_breakdown.index)
         os_breakdown.index = os_breakdown.index.str.replace('endpoints_os_','').str.replace('_',' ').str.capitalize().str.replace('Ibm','IBM').str.replace('Hpux','HP-UX').str.replace('sparc','Sparc')
         if hdata is not None:
-            print(hdata)
+            # print(hdata)
             percentage = str(round(100*os_breakdown[hdata['points'][0]['x']]/os_breakdown.sum(),2))+'%'
             return 'Breakdown of OS Endpoints - '+hdata['points'][0]['x'].replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hp-ux','HP-UX').replace('sparc','Sparc')+": "+percentage
         else:
