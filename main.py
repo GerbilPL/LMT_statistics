@@ -7,7 +7,7 @@ import dash_daq as daq
 
 class LMT_Statistics:
     def __init__(self,
-                 statistic_file: str,
+                 statistic_file: str = "history.csv",
                  font_size: int = 24,
                  font_family: str = "IBM Plex Sans",
                  ):
@@ -26,6 +26,7 @@ class LMT_Statistics:
         self.font_size = font_size
         self.font_family = font_family
         self.data = self.import_data()
+        self.web_layout = None
 
     def import_data(self)->pd.DataFrame:
         """
@@ -838,15 +839,20 @@ class LMT_Statistics:
         :param assets_folder: path to assets folder
         :type assets_folder: str
         """
-        if hasattr(self, 'web_layout'):
+        if self.web_layout!=None:
             app = dash.Dash(name=_name, title="LMT Statistics", assets_folder=assets_folder)
             app.layout = self.web_layout
-            app.run_server(port=8080, debug=_debug)
+            return app.server
         else:
             raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
+    
+    def server_handle(self):
+        app = dash.Dash(title="LMT Statistics")
+        app.layout = self.web_layout
+        return app.server
 
 
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=True)
+    lmt.run_server(_debug=False).run(port=8050)
