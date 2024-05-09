@@ -195,6 +195,11 @@ h2{
     margin: auto;
 }
 
+#endpoints-chart-title, #chart-title{
+    width: 100%;
+    margin: 100px auto -50px;
+}
+
 #breakdown-checklist, #average-checklist{
     width: 80%;
     margin: auto;
