@@ -38,7 +38,7 @@ class LMT_Statistics:
         data = pd.read_csv(self.statistic_file)
         data['data_collection_time'] = pd.to_datetime(data['data_collection_time'])
         return data
-
+    
 
     def tick_vals(self, min_value:float, max_value:float,is_percentage:bool=False)->list:
         """
@@ -112,7 +112,7 @@ class LMT_Statistics:
                 hoverlabel=layout_hoverlabel,
                 legend=layout_legend
             )
-        ) 
+        )
         if html_id != '':
             graph.__setattr__("id",html_id)
         div = html.Div([
@@ -226,10 +226,14 @@ class LMT_Statistics:
             ], className="card-container")
         return div
     
-    def barchart_endpoints_percentage(self,_df):
+    def barchart_endpoints_percentage(self, _df, period_type):
         filtered = _df.copy(deep=True)
 
-        filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        if period_type == "M":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        elif period_type == "Q":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("Q")
+
         grouped = filtered.groupby("year_month")[["endpoints_all", "endpoints_disconnected"]].sum().reset_index()
         grouped["year_month"] = grouped["year_month"].dt.to_timestamp()
 
@@ -282,10 +286,14 @@ class LMT_Statistics:
 
 
 
-    def barchart_endpoints_value(self,_df):
+    def barchart_endpoints_value(self, _df, period_type):
         filtered = _df.copy(deep=True)
 
-        filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        if period_type == "M":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        elif period_type == "Q":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("Q")
+        
         grouped = filtered.groupby("year_month")[["endpoints_all", "endpoints_disconnected"]].sum().reset_index()
         grouped["year_month"] = grouped["year_month"].dt.to_timestamp()
 
@@ -293,7 +301,6 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        #nie ma log bo wtedy tez slabo widac
         fig = px.bar(grouped, x='year_month', y=['endpoints_connected', 'endpoints_disconnected'], title='Endpoints All', labels={'year_month': 'Date', 'value': 'Endpoints value'}) # , log_y=True)
 
         fig.update_traces(
@@ -335,10 +342,14 @@ class LMT_Statistics:
         return div
 
 
-    def barchart_database_percentage(self,_df):
+    def barchart_database_percentage(self, _df, period_type):
         filtered = _df.copy(deep=True)
 
-        filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        if period_type == "M":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        elif period_type == "Q":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("Q")
+
         filtered["year_month"] = filtered["year_month"].dt.to_timestamp()
         grouped = filtered.groupby(["year_month", "lmt_database_type"]).size().unstack(fill_value=0)
 
@@ -394,10 +405,14 @@ class LMT_Statistics:
         return div
 
 
-    def barchart_database_value(self,_df):
+    def barchart_database_value(self, _df, period_type):
         filtered = _df.copy(deep=True)
 
-        filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        if period_type == "M":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        elif period_type == "Q":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("Q")
+
         filtered["year_month"] = filtered["year_month"].dt.to_timestamp()
         grouped = filtered.groupby(["year_month", "lmt_database_type"]).size().unstack(fill_value=0)
 
@@ -443,49 +458,6 @@ class LMT_Statistics:
 
         return div
 
-
-    # def get_disconnected_endpoints_over_time(self,_df:pd.DataFrame):
-    #     """
-    #     Generates a bar chart showing the percentage of disconnected endpoints over time.
-
-    #     :param _df: DataFrame containing the data
-    #     :return: A Dash HTML div containing the bar chart
-    #     """
-    #     # Copy the DataFrame to avoid modifying the original data
-    #     filtered = _df.copy(deep=True)
-
-    #     # Group the data by year and month
-    #     filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
-    #     grouped = filtered.groupby("year_month")[["endpoints_all", "endpoints_disconnected"]].sum().reset_index()
-    #     grouped["year_month"] = grouped["year_month"].dt.to_timestamp()
-
-    #     # Calculate the percentage of disconnected endpoints
-    #     grouped["disconnected_percent"] = grouped["endpoints_disconnected"] / grouped["endpoints_all"]
-    #     grouped["connected_percent"] = 1 - grouped["disconnected_percent"]
-
-    #     return grouped
-    
-    # def get_database_types_over_time(self,_df:pd.DataFrame):
-    #     """
-    #     Generates a bar chart showing the percentage of different database types over time.
-
-    #     :param _df: DataFrame containing the data
-    #     :return: A Dash HTML div containing the bar chart
-    #     """
-    #     # Copy the DataFrame to avoid modifying the original data
-    #     filtered = _df.copy(deep=True)
-
-    #     # Group the data by year and month and database type
-    #     filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
-    #     filtered["year_month"] = filtered["year_month"].dt.to_timestamp()
-    #     grouped = filtered.groupby(["year_month", "lmt_database_type"]).size().unstack(fill_value=0)
-
-    #     # Calculate the percentage of each database type
-    #     grouped['total'] = grouped.sum(axis=1)
-    #     grouped_percentage = grouped.div(grouped['total'], axis=0) * 1
-    #     grouped_percentage.drop(columns=['total'], inplace=True)
-
-    #     return grouped_percentage
 
     def get_os_breakdown(self,_df:pd.DataFrame)->tuple:
         """
@@ -599,13 +571,19 @@ class LMT_Statistics:
             x=1,
         )
 
+        # Make dictionary for both os breakdown and endpoints per os average
+        checkbox_os_breakdown = dict(zip(os_labels_breakdown, os_breakdown.axes[0]))
+        checkbox_os_avg = dict(zip(os_labels_avgs, os_avgs.axes[0]))
+
+        def generate_column_options(df):
+            available_columns = [{'label': col, 'value': col} for col in df.columns if col != 'data_collection_time']
+            return available_columns
+
         layout = html.Div([
             html.Div(
                 className="full-screen",
                 id="top",
                 children=[
-                    # html.Img(src=("assets/ibm_bg.jpg")),
-                    # html.H1("IBM Dashboard"),
                     html.A(html.Button("More", className="btn"), href="#first")
                 ]
             ),
@@ -642,82 +620,110 @@ class LMT_Statistics:
                     html.A("^", href="#first")
                 ]
             ),
-            
-            # html.H1(["LMT Statistics"," — ","Dashboard"],style={"textAlign": "center"},  id="first"),
 
-            self.dataTable(data),
+            # html.Div(className='group-by', children=[
+                # html.Label("Gruop by: "),
+                dcc.Dropdown(
+                    id='period-selector',
+                    options=[
+                        {'label': 'Monthly', 'value': 'M'},
+                        {'label': 'Quarterly', 'value': 'Q'}
+                    ],
+                    value='M'
+                ),
+            # ]),
+            
+            html.Div(className='two-columns', children=[
+                html.Div([
+                    dcc.Dropdown(
+                        id='column-dropdown-1',
+                        options=generate_column_options(data),
+                        value=generate_column_options(data)[0]['value'] if generate_column_options(data) else None
+                    ),
+                    
+                    dcc.Graph(id='graph-1'),
+                ]),
+
+                html.Div([
+                    dcc.Dropdown(
+                        id='column-dropdown-2',
+                        options=generate_column_options(data),
+                        value=generate_column_options(data)[0]['value'] if generate_column_options(data) else None
+                    ),
+                    
+                    dcc.Graph(id='graph-2')
+                ]),
+            ]),
+
             html.Div([
+                html.Div(id='toggle-output', className='toggle-output'),
+
                 daq.ToggleSwitch(
                     id='toggle-switch',
                     value=True,
                     label=["VALUES", "PERCENTAGES"]
-                ),
-                html.Div(id='toggle-output')
+                )
             ]),
 
-            # html.H2("Disconnected Endpoints Over Time"),
-            # self.bar_chart(
-            #     disconnected_endpoints_over_time,
-            #     "Endpoints All", False,
-            #     'year_month', ['connected_percent', 'disconnected_percent'],
-            #     _labels={'year_month': 'Date', 'value': 'Endpoints percentage'},
-            #     tick_values=disconnected_endpoints_over_time_tick_vals, tick_labels=disconnected_endpoints_over_time_tick_labels,
-            #     traces=traces,layout_hoverlabel=hoverlabel,layout_legend=legend,html_id='graph-endpoints-over-time'
-            # ),
-
-            # html.H2("Database Types Over Time"),
-            # self.bar_chart(
-            #     database_types_over_time,
-            #     "Database types", False, '', '',
-            #     _labels={'year_month': 'Date', 'value': 'Types percentage'},
-            #     tick_values=database_types_over_time_tick_vals, tick_labels=database_types_over_time_tick_labels,
-            #     traces=traces,layout_hoverlabel=hoverlabel,layout_legend=legend,html_id='graph-database-type-over-time'
-            # ),
-
-            html.H2("Breakdown of OS Endpoints",id='graph-os-endpoint-breakdown-title'),
+            html.Div(className='two-columns', children=[
+                html.Div([
+                    html.H2("Breakdown of OS Endpoints",id='graph-os-endpoint-breakdown-title'),
             
-            dcc.Checklist(
-                id="breakdown-checklist",
-                options=[{'label': label, 'value': label} for label in os_breakdown.axes[0]],
-                value=os_breakdown.axes[0],
-                inline=True
-            ),
+                    dcc.Checklist(
+                        id="breakdown-checklist",
+                        options=[{'label': key, 'value': value} for key,value in checkbox_os_breakdown.items()],
+                        value=os_breakdown.axes[0],
+                        inline=True,
+                        labelStyle={'font-size': self.font_size, 'font-family': self.font_family, 'margin': '10px'}
+                    ),
 
-            self.bar_chart(
-                pd.DataFrame({
-                    'OS': os_labels_breakdown, 'Endpoints': os_breakdown
-                }),
-                "", True, 'OS', 'Endpoints',
-                {'index': 'OS', 'y': 'Endpoints'},
-                os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='',html_id='graph-os-endpoint-breakdown'
-            ),
+                    self.bar_chart(
+                        pd.DataFrame({
+                            'OS': os_labels_breakdown, 'Endpoints': os_breakdown
+                        }),
+                        "", True, 'OS', 'Endpoints',
+                        {'index': 'OS', 'y': 'Endpoints'},
+                        os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
+                        layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='',html_id='graph-os-endpoint-breakdown'
+                    ),
+                ]),
+
+                html.Div([
+                    html.H2("Average number of endpoints per OS",id='graph-endpoints-per-os-avg-title'),
             
-            html.H2("Average number of endpoints per OS",id='graph-endpoints-per-os-avg-title'),
+                    dcc.Checklist(
+                        id="average-checklist",
+                        options=[{'label': key, 'value': value} for key,value in checkbox_os_avg.items()],
+                        value=os_avgs.axes[0],
+                        inline=True,
+                        labelStyle={'font-size': self.font_size, 'font-family': self.font_family, 'margin': '10px'}
+                    ),
+
+                    self.bar_chart(
+                        pd.DataFrame({
+                            'OS': os_labels_avgs, 'Endpoints': os_avgs
+                        }),
+                        "", True, 'OS', 'Endpoints',
+                        {'index': 'OS', 'y': 'Endpoints'},
+                        endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels,
+                        layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f',html_id='graph-endpoints-per-os-avg'
+                    ),
+                ]),
+            ]),
             
-            dcc.Checklist(
-                id="average-checklist",
-                options=[{'label': label, 'value': label} for label in os_avgs.axes[0]],
-                value=os_avgs.axes[0],
-                inline=True
-            ),
-
-            self.bar_chart(
-                pd.DataFrame({
-                    'OS': os_labels_avgs, 'Endpoints': os_avgs
-                }),
-                "", True, 'OS', 'Endpoints',
-                {'index': 'OS', 'y': 'Endpoints'},
-                endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels,
-                layout_hoverlabel=hoverlabel,layout_legend=legend,_text_auto='.3f',html_id='graph-endpoints-per-os-avg'
-            ),
-
             self.card([
                 f"{software_instances_avg_per_endpoint:.3f}",
                 f"{endpoints_per_customer:.3f}"],
                 ["Average number of software instances per endpoint",
                 "Average number of endpoints per customer"]
-            ),   
+            ),
+
+            self.dataTable(data),
+
+            # html.Div(className='all-charts', children=[
+            #     html.Div([dcc.Graph(id=f'graph-{i}', figure=self.create_all_charts(data, column)) for i, column in enumerate(data.columns) if column != 'data_collection_time'])
+            # ])
+
         ], className="dashboard"
         )
         self.callbacks()
@@ -733,23 +739,17 @@ class LMT_Statistics:
             filtered_data = os_breakdown[selected_columns]
             filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
-                    'OS': filtered_data.axes[0], 
+                    'OS': filtered_data_labels, 
                     'Endpoints': filtered_data})
+            tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]),max(os_breakdown))
         else:
             os_breakdown, _ = self.get_endpoints_per_os(data)
             filtered_data = os_breakdown[selected_columns]
             filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
-                    'OS': filtered_data.axes[0], 
+                    'OS': filtered_data_labels, 
                     'Endpoints': filtered_data})
-        # print(filtered_data_labels,filtered_data.axes[0])
-        labels = {}
-        for key in filtered_data.axes[0]:
-            for value in filtered_data_labels:
-                labels[key]=value
-                filtered_data_labels.remove(value)
-                break
-        # print(labels)
+            tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]),max(os_breakdown))
 
         fig = px.bar(dt,x='OS',y='Endpoints')
         fig.update_layout(
@@ -767,25 +767,95 @@ class LMT_Statistics:
                 xanchor="right",
                 x=1,
             ),
-            hovermode='x unified',
+            font=dict(
+                family="IBM Plex Sans",
+                size=24,
+                color="black"
+            ),
+            hovermode='x',
             yaxis_type='log',
             height=600,
         )
-        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y}</b><extra></extra>')
+        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y:}</b><extra></extra>')
+        fig.update_yaxes(tickvals=tick_values, ticktext=tick_labels)
         return fig
     
     def update_title(self, hdata):
-        # print(hdata)
         data = self.import_data()
         os_breakdown, _ = self.get_os_breakdown(data)
+        # print(os_breakdown.index)
+        os_breakdown.index = os_breakdown.index.str.replace('endpoints_os_','').str.replace('_',' ').str.capitalize().str.replace('Ibm','IBM').str.replace('Hpux','HP-UX').str.replace('sparc','Sparc')
         if hdata is not None:
+            # print(hdata)
             percentage = str(round(100*os_breakdown[hdata['points'][0]['x']]/os_breakdown.sum(),2))+'%'
-            return 'Breakdown of OS Endpoints - '+hdata['points'][0]['x'].replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc')+": "+percentage
+            return 'Breakdown of OS Endpoints - '+hdata['points'][0]['x'].replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hp-ux','HP-UX').replace('sparc','Sparc')+": "+percentage
         else:
             return 'Breakdown of OS Endpoints'
 
-    def callbacks(self):
 
+    def create_line_chart(self, df, selected_column, period_type):
+        filtered = df.copy(deep=True)
+
+        if period_type == "M":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("M")
+        elif period_type == "Q":
+            filtered["year_month"] = filtered["data_collection_time"].dt.to_period("Q")
+
+        grouped = filtered.groupby("year_month")[selected_column].sum().reset_index()
+        grouped["year_month"] = grouped["year_month"].dt.to_timestamp()
+
+        fig = px.line(grouped, x='year_month', y=selected_column, title='Chart - '+selected_column)
+
+        fig.update_traces(
+            hoverinfo='all',
+            hovertemplate='<b>%{y:}</b><extra></extra>')
+        
+        fig.update_layout(
+            legend_title_text="",
+            height=600,
+            font=dict(
+                family="IBM Plex Sans",
+                size=18,
+                color="black"
+            ),
+            hovermode="x",
+            hoverlabel=dict(
+                bgcolor="white",
+                font_size=18,
+                font_family="IBM Plex Sans",
+                font_color="black",
+                bordercolor="black",
+            ),
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+            ),
+        )
+
+        return fig
+
+
+    def callbacks(self):
+        @callback(
+            Output('graph-1', 'figure'),
+            [Input('column-dropdown-1', 'value'),
+             Input('period-selector', 'value')]
+        )
+        def update_graph_1(selected_col, period_type):
+            return self.create_line_chart(self.data, selected_col, period_type)
+
+        # Callback dla drugiego wykresu
+        @callback(
+            Output('graph-2', 'figure'),
+            [Input('column-dropdown-2', 'value'),
+             Input('period-selector', 'value')]
+        )
+        def update_graph_2(selected_column, period_type):
+            return self.create_line_chart(self.data, selected_column, period_type)
+        
         @callback(
             Output('graph-os-endpoint-breakdown', 'figure'),
             Input('breakdown-checklist', 'value')
@@ -809,13 +879,14 @@ class LMT_Statistics:
         
         @callback(
             Output('toggle-output', 'children'),
-            [Input('toggle-switch', 'value')]
+            [Input('toggle-switch', 'value'),
+             Input('period-selector', 'value')]
         )
-        def update_output(value):
+        def update_output(value, period_type):
             if value:
-                return self.barchart_endpoints_percentage(self.data), self.barchart_database_percentage(self.data)
+                return self.barchart_endpoints_percentage(self.data, period_type), self.barchart_database_percentage(self.data, period_type)
             else:
-                return self.barchart_endpoints_value(self.data), self.barchart_database_value(self.data)
+                return self.barchart_endpoints_value(self.data, period_type), self.barchart_database_value(self.data, period_type)
 
 
     def run_server(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
@@ -841,4 +912,4 @@ class LMT_Statistics:
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=False)
+    lmt.run_server(_debug=True)
