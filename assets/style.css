@@ -90,6 +90,7 @@ html, body{
     margin: 0;
     padding: 0;
     scroll-behavior: smooth;
+    overflow-y: hidden;
 }
 
 .card-container{
@@ -232,11 +233,11 @@ h2{
     max-height: 100vh;
 } */
 
-.content{
+/* .content{
     max-width: 800px;
     margin: 20px auto;
     text-align: center;
-}
+} */
 
 .btn{
     padding: 10px 20px;
@@ -257,8 +258,8 @@ h2{
     background-color: var(--background-color);
     /* background-color: var(--primary-color); */
     padding: 20px;
-    margin-bottom: 50px;
     position: sticky;
+    height: 7.5vh;
 }
   
 .logo{
@@ -333,7 +334,7 @@ h2{
 }
 
 ::-webkit-scrollbar-thumb{
-    background: lightgray; 
+    background: lightgray;
     border-radius: 10px;
 }
   
@@ -373,14 +374,28 @@ h2{
 
 #period-selector{
     width: 7%;
-    margin: auto auto 50px 20px;
+    margin: 50px auto 30px 20px;
 }
 
-/* .group-by{
-    width: 50%;
+#main-content{
+    height: 92.5vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    box-shadow: 0px -10px 5px rgba(0, 0, 0, 0.1);
 }
 
-.group-by *{
-    display: inline;
-} */
-  
+.file-uploader{
+    padding-top: 50px;
+    padding-bottom: 50px;
+    width: 100%;
+    background-color: var(--background-color);
+    text-align: center;
+    cursor: pointer;
+}
+
+#refresh-button{
+    background-color: var(--ibm-blue-80);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
