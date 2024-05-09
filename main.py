@@ -827,7 +827,7 @@ class LMT_Statistics:
                 return self.barchart_endpoints_value(self.data), self.barchart_database_value(self.data)
 
 
-    def run_server(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
+    def server_handle(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
         """
         Runs a default dash server. Call after LMT_Statistics.init() method or set LMT_Statistics.web_layout 
         to either LMT_Statistics.init() output or custom html layout.
@@ -845,14 +845,9 @@ class LMT_Statistics:
             return app.server
         else:
             raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
-    
-    def server_handle(self):
-        app = dash.Dash(title="LMT Statistics")
-        app.layout = self.web_layout
-        return app.server
 
 
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=False).run(port=8050)
+    lmt.server_handle(_debug=False).run(port=8050)
