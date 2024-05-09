@@ -194,10 +194,7 @@ class LMT_Statistics:
         graph = dcc.Graph(
             figure=(
                 px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels,
-                       text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title,
-                                                                                        log_y=logarithmic_y_axis,
-                                                                                        labels=_labels,
-                                                                                        text_auto=_text_auto)
+                       text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
             )
             .update_yaxes(tickvals=tick_values, ticktext=tick_labels)
             .update_traces(traces)
@@ -214,10 +211,7 @@ class LMT_Statistics:
             graph.__setattr__("id", html_id)
         return dcc.figure(
             px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels,
-                   text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title,
-                                                                                    log_y=logarithmic_y_axis,
-                                                                                    labels=_labels,
-                                                                                    text_auto=_text_auto)
+                   text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
         ).update_yaxes(tickvals=tick_values, ticktext=tick_labels).update_traces(traces).update_layout(
             legend_title_text="",
             height=600,
@@ -639,7 +633,7 @@ class LMT_Statistics:
         file_uploader = self.create_upload()
 
         def generate_column_options(df):
-            available_columns = [{'label': col, 'value': col} for col in df.columns if col != 'data_collection_time']
+            available_columns = [{'label': col, 'value': col} for col in df.columns if col != 'data_collection_time' and col != 'lmt_server_install_time' and col != 'lmt_scanner_version_oldest' and col != 'lmt_server_version' and col != 'lmt_database_version' and col != 'lmt_database_type' and col != 'last_import_status']
             return available_columns
 
         layout = html.Div([
