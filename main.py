@@ -257,7 +257,7 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped, x='year_month', y=['connected_percent', 'disconnected_percent'], title='Endpoints All', labels={'year_month': 'Date', 'value': 'Endpoints percentage'})
+        fig = px.bar(grouped, x='year_month', y=['connected_percent', 'disconnected_percent'], labels={'year_month': 'Date', 'value': 'Endpoints percentage'})
 
         fig.update_yaxes(tickvals=[i / 10 for i in range(11)], ticktext=[f"{i * 10}%" for i in range(11)])
 
@@ -293,6 +293,7 @@ class LMT_Statistics:
         fig.update_xaxes(tickvals=grouped['year_month'], ticktext=format_xaxis(period_type, grouped['year_month']))
 
         div = html.Div([
+            html.H2("Endpoints All", id='endpoints-chart-title'),
             dcc.Graph(
                 id='graph-endpoints-over-time',
                 figure=fig
@@ -318,7 +319,7 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped, x='year_month', y=['endpoints_connected', 'endpoints_disconnected'], title='Endpoints All', labels={'year_month': 'Date', 'value': 'Endpoints value'})  # , log_y=True)
+        fig = px.bar(grouped, x='year_month', y=['endpoints_connected', 'endpoints_disconnected'], labels={'year_month': 'Date', 'value': 'Endpoints value'})  # , log_y=True)
 
         fig.update_traces(
             hoverinfo='all',
@@ -352,6 +353,7 @@ class LMT_Statistics:
         fig.update_xaxes(tickvals=grouped['year_month'], ticktext=format_xaxis(period_type, grouped['year_month']))
 
         div = html.Div([
+            html.H2("Endpoints All", id='endpoints-chart-title'),
             dcc.Graph(
                 id='graph-endpoints-over-time',
                 figure=fig
@@ -380,7 +382,7 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped_percentage, title='Database types', labels={'year_month': 'Date', 'value': 'Types percentage'})
+        fig = px.bar(grouped_percentage, labels={'year_month': 'Date', 'value': 'Types percentage'})
 
         fig.update_yaxes(tickvals=[i / 10 for i in range(11)], ticktext=[f"{i * 10}%" for i in range(11)])
 
@@ -416,6 +418,7 @@ class LMT_Statistics:
         fig.update_xaxes(tickvals=grouped.index, ticktext=format_xaxis(period_type, grouped.index))
 
         div = html.Div([
+            html.H2("Database types", id='chart-title'),
             dcc.Graph(
                 id='graph-database-type-over-time',
                 figure=fig
@@ -439,7 +442,7 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped, title='Database types', labels={'year_month': 'Date', 'value': 'Types value'})
+        fig = px.bar(grouped, labels={'year_month': 'Date', 'value': 'Types value'})
 
         fig.update_traces(
             hoverinfo='all',
@@ -473,6 +476,7 @@ class LMT_Statistics:
         fig.update_xaxes(tickvals=grouped.index, ticktext=format_xaxis(period_type, grouped.index))
 
         div = html.Div([
+            html.H2("Database types", id='chart-title'),
             dcc.Graph(
                 id='graph-database-type-over-time',
                 figure=fig
@@ -655,7 +659,7 @@ class LMT_Statistics:
                         className="nav-links",
                         children=[
                             html.Li(html.A("Compare Charts", href="#compare-charts")),
-                            html.Li(html.A("Endpoints / Databases", href="#graph-endpoints-over-time")),
+                            html.Li(html.A("Endpoints / Databases", href="#endpoints-chart-title")),
                             html.Li(html.A("OS Charts", href="#graph-os-endpoint-breakdown-title")),
                             html.Li(html.A("Upload file", href="#refresh-div")),
                         ],
