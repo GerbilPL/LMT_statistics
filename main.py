@@ -15,16 +15,16 @@ class LMT_Statistics:
                  font_family: str = "IBM Plex Sans",
                  ):
         """
-        Web application for LMT statistics.
-        Supports launching a default dash server via LMT_Statistics.run_server() method or returning a dash.html.Div object via LMT_Statistics.init() method.
+            Web application for LMT statistics.
+            Supports launching a default dash server via LMT_Statistics.run_server() method or returning a dash.html.Div object via LMT_Statistics.init() method.
 
-        :param statistic_file: path to csv file
-        :type statistic_file: str
-        :param font_size: font size
-        :type font_size: int
-        :param font_family: font family
-        :type font_family: str
-        """
+            :param statistic_file: path to csv file
+            :type statistic_file: str
+            :param font_size: font size
+            :type font_size: int
+            :param font_family: font family
+            :type font_family: str
+            """
         self.web_layout = None
         self.statistic_file = statistic_file
         self.font_size = font_size
@@ -34,30 +34,31 @@ class LMT_Statistics:
 
     def import_data(self) -> pd.DataFrame:
         """
-        Imports data from csv file. Converts timestamps.
+            Imports data from csv file. Converts timestamps.
 
-        :return: DataFrame from csv file
-        :rtype: pd.DataFrame
-        """
+            :return: DataFrame from csv file
+            :rtype: pd.DataFrame
+            """
 
         data = pd.read_csv(self.statistic_file)
         data['data_collection_time'] = pd.to_datetime(data['data_collection_time'])
         return data
 
-    def tick_vals(self, min_value: float, max_value: float, is_percentage: bool = False) -> tuple[
+    @staticmethod
+    def tick_vals(min_value: float, max_value: float, is_percentage: bool = False) -> tuple[
         list[float], list[str]]:
         """
-        Generates tick values and tick labels based on specified parameters for use with graphs
+            Generates tick values and tick labels based on specified parameters for use with graphs
 
-        :param min_value: minimum value
-        :type min_value: float
-        :param max_value: maximum value
-        :type max_value: float
-        :param is_percentage: if True, generates tick values and tick labels for percentage graphs
-        :type is_percentage: bool
-        :return: tick values and tick labels
-        :rtype: list
-        """
+            :param min_value: minimum value
+            :type min_value: float
+            :param max_value: maximum value
+            :type max_value: float
+            :param is_percentage: if True, generates tick values and tick labels for percentage graphs
+            :type is_percentage: bool
+            :return: tick values and tick labels
+            :rtype: list
+            """
         if is_percentage:
             tick_values = [i / 10 for i in range(11)]
             tick_labels = [f"{i * 10}%" for i in range(11)]
@@ -75,37 +76,37 @@ class LMT_Statistics:
                   layout_hovermode: str = "x", layout_hoverlabel: dict = {}, layout_legend: dict = {},
                   html_id: str = '', _text_auto=False) -> html.Div:
         """
-        Generates a div with a bar chart based on specified parameters
+            Generates a div with a bar chart based on specified parameters
 
-        :param _df: DataFrame
-        :type _df: pd.DataFrame
-        :param _title: title of the chart
-        :type _title: str
-        :param logarithmic_y_axis: if True, y-axis is logarithmic
-        :type logarithmic_y_axis: bool
-        :param _x: list of x values to use
-        :type _x: list
-        :param _y: list of y values to use
-        :type _y: list
-        :param _labels: dictionary of labels to use
-        :type _labels: dict
-        :param tick_values: list of tick values (for making simpler y-axis divisions)
-        :type tick_values: list
-        :param tick_labels: list of tick labels
-        :type tick_labels: list
-        :param traces: list of traces to use in update_traces() for a graph
-        :type traces: list
-        :param layout_hovermode: hovermode for the graph (in update_layout())
-        :type layout_hovermode: str
-        :param layout_hoverlabel: hoverlabel for the graph (in update_layout())
-        :type layout_hoverlabel: dict
-        :param layout_legend: legend for the graph (in update_layout())
-        :type layout_legend: dict
-        :param html_id: id of the div containing the graph (if empty, no id is set)
-        :type html_id: str
-        :return: A Dash HTML div containing the bar chart
-        :rtype: html.Div
-        """
+            :param _df: DataFrame
+            :type _df: pd.DataFrame
+            :param _title: title of the chart
+            :type _title: str
+            :param logarithmic_y_axis: if True, y-axis is logarithmic
+            :type logarithmic_y_axis: bool
+            :param _x: list of x values to use
+            :type _x: list
+            :param _y: list of y values to use
+            :type _y: list
+            :param _labels: dictionary of labels to use
+            :type _labels: dict
+            :param tick_values: list of tick values (for making simpler y-axis divisions)
+            :type tick_values: list
+            :param tick_labels: list of tick labels
+            :type tick_labels: list
+            :param traces: list of traces to use in update_traces() for a graph
+            :type traces: list
+            :param layout_hovermode: hovermode for the graph (in update_layout())
+            :type layout_hovermode: str
+            :param layout_hoverlabel: hoverlabel for the graph (in update_layout())
+            :type layout_hoverlabel: dict
+            :param layout_legend: legend for the graph (in update_layout())
+            :type layout_legend: dict
+            :param html_id: id of the div containing the graph (if empty, no id is set)
+            :type html_id: str
+            :return: A Dash HTML div containing the bar chart
+            :rtype: html.Div
+            """
         graph = dcc.Graph(
             figure=(
                 px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels,
@@ -132,14 +133,15 @@ class LMT_Statistics:
         ])
         return div
 
-    def dataTable(self, _df: pd.DataFrame) -> html.Div:
+    @staticmethod
+    def data_table(_df: pd.DataFrame) -> html.Div:
         """
-        Generates a div with a dataTable based on specified parameters
+            Generates a div with a dataTable based on specified parameters
 
-        :param _df: DataFrame
-        :return: A Dash HTML div containing the dataTable
-        :rtype: html.Div
-        """
+            :param _df: DataFrame
+            :return: A Dash HTML div containing the dataTable
+            :rtype: html.Div
+            """
         div = html.Div([
             dash_table.DataTable(
                 id='datatable-interactivity',
@@ -161,41 +163,44 @@ class LMT_Statistics:
                    layout_hovermode: str = "x", layout_hoverlabel: dict = {}, layout_legend: dict = {},
                    html_id: str = '', _text_auto=False):
         """
-        Generates a div with a bar chart based on specified parameters
+            Generates a div with a bar chart based on specified parameters
 
-        :param _df: DataFrame
-        :type _df: pd.DataFrame
-        :param _title: title of the chart
-        :type _title: str
-        :param logarithmic_y_axis: if True, y-axis is logarithmic
-        :type logarithmic_y_axis: bool
-        :param _x: list of x values to use
-        :type _x: list
-        :param _y: list of y values to use
-        :type _y: list
-        :param _labels: dictionary of labels to use
-        :type _labels: dict
-        :param tick_values: list of tick values (for making simpler y-axis divisions)
-        :type tick_values: list
-        :param tick_labels: list of tick labels
-        :type tick_labels: list
-        :param traces: list of traces to use in update_traces() for a graph
-        :type traces: list
-        :param layout_hovermode: hovermode for the graph (in update_layout())
-        :type layout_hovermode: str
-        :param layout_hoverlabel: hoverlabel for the graph (in update_layout())
-        :type layout_hoverlabel: dict
-        :param layout_legend: legend for the graph (in update_layout())
-        :type layout_legend: dict
-        :param html_id: id of the div containing the graph (if empty, no id is set)
-        :type html_id: str
-        :return: A Dash HTML div containing the bar chart
-        :rtype: html.Div
-        """
+            :param _df: DataFrame
+            :type _df: pd.DataFrame
+            :param _title: title of the chart
+            :type _title: str
+            :param logarithmic_y_axis: if True, y-axis is logarithmic
+            :type logarithmic_y_axis: bool
+            :param _x: list of x values to use
+            :type _x: list
+            :param _y: list of y values to use
+            :type _y: list
+            :param _labels: dictionary of labels to use
+            :type _labels: dict
+            :param tick_values: list of tick values (for making simpler y-axis divisions)
+            :type tick_values: list
+            :param tick_labels: list of tick labels
+            :type tick_labels: list
+            :param traces: list of traces to use in update_traces() for a graph
+            :type traces: list
+            :param layout_hovermode: hovermode for the graph (in update_layout())
+            :type layout_hovermode: str
+            :param layout_hoverlabel: hoverlabel for the graph (in update_layout())
+            :type layout_hoverlabel: dict
+            :param layout_legend: legend for the graph (in update_layout())
+            :type layout_legend: dict
+            :param html_id: id of the div containing the graph (if empty, no id is set)
+            :type html_id: str
+            :return: A Dash HTML div containing the bar chart
+            :rtype: html.Div
+            """
         graph = dcc.Graph(
             figure=(
                 px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels,
-                       text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
+                       text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title,
+                                                                                        log_y=logarithmic_y_axis,
+                                                                                        labels=_labels,
+                                                                                        text_auto=_text_auto)
             )
             .update_yaxes(tickvals=tick_values, ticktext=tick_labels)
             .update_traces(traces)
@@ -212,7 +217,10 @@ class LMT_Statistics:
             graph.__setattr__("id", html_id)
         return dcc.figure(
             px.bar(_df, title=_title, x=_x, y=_y, log_y=logarithmic_y_axis, labels=_labels,
-                   text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title, log_y=logarithmic_y_axis, labels=_labels, text_auto=_text_auto)
+                   text_auto=_text_auto) if len(_x) > 0 and len(_y) > 0 else px.bar(_df, title=_title,
+                                                                                    log_y=logarithmic_y_axis,
+                                                                                    labels=_labels,
+                                                                                    text_auto=_text_auto)
         ).update_yaxes(tickvals=tick_values, ticktext=tick_labels).update_traces(traces).update_layout(
             legend_title_text="",
             height=600,
@@ -224,15 +232,15 @@ class LMT_Statistics:
 
     def card(self, _data: list, _labels: list) -> html.Div:
         """
-        Generates a div with a card based on specified parameters
+            Generates a div with a card based on specified parameters
 
-        :param _data: list of values
-        :type _data: list
-        :param _labels: list of labels
-        :type _labels: list
-        :return: div with a bar chart
-        :rtype: html.Div
-        """
+            :param _data: list of values
+            :type _data: list
+            :param _labels: list of labels
+            :type _labels: list
+            :return: div with a bar chart
+            :rtype: html.Div
+            """
         div = html.Div([
             html.Div([html.H3([l], className="card-title"), html.Span([str(d)], className="card-text")]
                      , className="card-body")
@@ -240,7 +248,8 @@ class LMT_Statistics:
         ], className="card-container")
         return div
 
-    def barchart_endpoints_percentage(self, _df, period_type):
+    @staticmethod
+    def barchart_endpoints_percentage(_df, period_type):
         filtered = _df.copy(deep=True)
         # fixes bug with loading new data
         filtered['data_collection_time'] = pd.to_datetime(filtered['data_collection_time'])
@@ -258,7 +267,8 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped, x='year_month', y=['connected_percent', 'disconnected_percent'], labels={'year_month': 'Date', 'value': 'Endpoints percentage'})
+        fig = px.bar(grouped, x='year_month', y=['connected_percent', 'disconnected_percent'],
+                     labels={'year_month': 'Date', 'value': 'Endpoints percentage'})
 
         fig.update_yaxes(tickvals=[i / 10 for i in range(11)], ticktext=[f"{i * 10}%" for i in range(11)])
 
@@ -303,7 +313,8 @@ class LMT_Statistics:
 
         return div
 
-    def barchart_endpoints_value(self, _df, period_type):
+    @staticmethod
+    def barchart_endpoints_value(_df, period_type):
         filtered = _df.copy(deep=True)
         # fixes bug with loading new data
         filtered['data_collection_time'] = pd.to_datetime(filtered['data_collection_time'])
@@ -320,7 +331,8 @@ class LMT_Statistics:
 
         # print(grouped.head())
 
-        fig = px.bar(grouped, x='year_month', y=['endpoints_connected', 'endpoints_disconnected'], labels={'year_month': 'Date', 'value': 'Endpoints value'})  # , log_y=True)
+        fig = px.bar(grouped, x='year_month', y=['endpoints_connected', 'endpoints_disconnected'],
+                     labels={'year_month': 'Date', 'value': 'Endpoints value'})  # , log_y=True)
 
         fig.update_traces(
             hoverinfo='all',
@@ -363,7 +375,8 @@ class LMT_Statistics:
 
         return div
 
-    def barchart_database_percentage(self, _df, period_type):
+    @staticmethod
+    def barchart_database_percentage(_df, period_type):
         filtered = _df.copy(deep=True)
 
         filtered['data_collection_time'] = pd.to_datetime(filtered['data_collection_time'])
@@ -428,7 +441,8 @@ class LMT_Statistics:
 
         return div
 
-    def barchart_database_value(self, _df, period_type):
+    @staticmethod
+    def barchart_database_value(_df, period_type):
         filtered = _df.copy(deep=True)
 
         filtered['data_collection_time'] = pd.to_datetime(filtered['data_collection_time'])
@@ -486,58 +500,67 @@ class LMT_Statistics:
 
         return div
 
-    def get_os_breakdown(self, _df: pd.DataFrame) -> tuple:
+    @staticmethod
+    def get_os_breakdown(_df: pd.DataFrame) -> tuple:
         """
-        Returns the total number of endpoints per os.
+            Returns the total number of endpoints per os.
 
-        :param _df: DataFrame containing the data
-        :type _df: pd.DataFrame
-        :return: columns of total number of endpoints per os and labels
-        :rtype: tuple
-        """
+            :param _df: DataFrame containing the data
+            :type _df: pd.DataFrame
+            :return: columns of total number of endpoints per os and labels
+            :rtype: tuple
+            """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
         os_totals = _df[os_columns].sum(axis=0).sort_values(ascending=False)
         os_labels = [
-            col.replace('endpoints_os_', '').replace('_', ' ').capitalize().replace('Ibm', 'IBM').replace('Hpux', 'HP-UX').replace('sparc', 'Sparc') for col in os_totals.axes[0]]
+            col.replace('endpoints_os_', '').replace('_', ' ').capitalize().replace('Ibm', 'IBM').replace('Hpux',
+                                                                                                          'HP-UX').replace(
+                'sparc', 'Sparc') for col in os_totals.axes[0]]
         return os_totals, os_labels
 
-    def get_endpoints_per_os(self, _df: pd.DataFrame) -> tuple:
+    @staticmethod
+    def get_endpoints_per_os(_df: pd.DataFrame) -> tuple:
         """
-        Returns the average number of endpoints per os.
+            Returns the average number of endpoints per os.
 
-        :param _df: DataFrame containing the data
-        :type _df: pd.DataFrame
-        :return: columns of average number of endpoints per os and labels
-        :rtype: tuple
-        """
+            :param _df: DataFrame containing the data
+            :type _df: pd.DataFrame
+            :return: columns of average number of endpoints per os and labels
+            :rtype: tuple
+            """
         os_columns = [col for col in _df.columns if col.startswith('endpoints_os_')]
         os_avgs = _df[os_columns].mean(axis=0).round(3).sort_values(ascending=False)
-        os_labels = [col.replace('endpoints_os_', '').replace('_', ' ').capitalize().replace('Ibm', 'IBM').replace('Hpux', 'HP-UX').replace('sparc', 'Sparc') for col in os_avgs.axes[0]]
+        os_labels = [
+            col.replace('endpoints_os_', '').replace('_', ' ').capitalize().replace('Ibm', 'IBM').replace('Hpux',
+                                                                                                          'HP-UX').replace(
+                'sparc', 'Sparc') for col in os_avgs.axes[0]]
         return os_avgs, os_labels
 
-    def get_avg_instance_per_endpoints(self, _df: pd.DataFrame) -> float:
+    @staticmethod
+    def get_avg_instance_per_endpoints(_df: pd.DataFrame) -> float:
         """
-        Returns average number of instances per endpoint.
+            Returns average number of instances per endpoint.
 
-        :param _df: DataFrame containing the data
-        :type _df: pd.DataFrame
-        :return: average number of instances per endpoint
-        :rtype: float
-        """
+            :param _df: DataFrame containing the data
+            :type _df: pd.DataFrame
+            :return: average number of instances per endpoint
+            :rtype: float
+            """
         endpoints_all = _df['endpoints_all'].sum()
         instances_all = _df['instances_all'].sum()
         avg = (instances_all / endpoints_all)
         return avg
 
-    def get_avg_endpoints_per_customer(self, _df: pd.DataFrame) -> float:
+    @staticmethod
+    def get_avg_endpoints_per_customer(_df: pd.DataFrame) -> float:
         """
-        Returns average number of endpoints per customer (or data length).
-        
-        :param _df: DataFrame containing the data
-        :type _df: pd.DataFrame
-        :return: average number of endpoints per customer
-        :rtype: float
-        """
+            Returns average number of endpoints per customer (or data length).
+
+            :param _df: DataFrame containing the data
+            :type _df: pd.DataFrame
+            :return: average number of endpoints per customer
+            :rtype: float
+            """
         endpoints_all = _df['endpoints_all'].sum()
         avg = (endpoints_all / len(_df))
         return avg
@@ -545,11 +568,11 @@ class LMT_Statistics:
     @staticmethod
     def create_upload() -> html.Div:
         """
-        Creates a div with an upload component for csv files.
+            Creates a div with an upload component for csv files.
 
-        :return: div with an upload component for csv files
-        :rtype: html.Div
-        """
+            :return: div with an upload component for csv files
+            :rtype: html.Div
+            """
         div = html.Div([
             dcc.Upload(
                 id='upload_data',
@@ -575,33 +598,34 @@ class LMT_Statistics:
 
     def make_graphs(self, return_to_self: bool = False) -> html.Div:
         """
-        Initializes and computes data based on specified csv file. Returns either a dash.html.Div layout or sets up layout for default web server (LMT.web_layout and LMT.run_server()).
-        Call before LMT_Statistics.run_server() method.
+            Initializes and computes data based on specified csv file. Returns either a dash.html.Div layout or sets up layout for default web server (LMT.web_layout and LMT.run_server()).
+            Call before LMT_Statistics.run_server() method.
 
-        :param return_to_self: if True, returns an empty dash.html.Div and sets LMT_Statistics.web_layout
-        :type return_to_self: bool
-        :return: dash.html.Div web layout or empty dash.html.Div
-        :rtype: dash.html.Div
-        """
+            :param return_to_self: if True, returns an empty dash.html.Div and sets LMT_Statistics.web_layout
+            :type return_to_self: bool
+            :return: dash.html.Div web layout or empty dash.html.Div
+            :rtype: dash.html.Div
+            """
 
         data = self.import_data()
 
+        # Disconnected endpoints over time disconnected_endpoints_over_time =
+        # self.get_disconnected_endpoints_over_time(data) disconnected_endpoints_over_time_tick_vals,
+        # disconnected_endpoints_over_time_tick_labels = self.tick_vals(0,100,is_percentage=True)
 
-        # Disconnected endpoints over time
-        # disconnected_endpoints_over_time = self.get_disconnected_endpoints_over_time(data)
-        # disconnected_endpoints_over_time_tick_vals, disconnected_endpoints_over_time_tick_labels = self.tick_vals(0,100,is_percentage=True)
-
-        # # Database types over time
-        # database_types_over_time = self.get_database_types_over_time(data)
-        # database_types_over_time_tick_vals, database_types_over_time_tick_labels = self.tick_vals(0,100,is_percentage=True)
+        # # Database types over time database_types_over_time = self.get_database_types_over_time(data)
+        # database_types_over_time_tick_vals, database_types_over_time_tick_labels = self.tick_vals(0,100,
+        # is_percentage=True)
 
         # Breakdown of OSes total
         os_breakdown, os_labels_breakdown = self.get_os_breakdown(data)
-        os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]), max(os_breakdown))
+        os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels = self.tick_vals(
+            min(os_breakdown[os_breakdown > 0]), max(os_breakdown))
 
         # Average number of endpoints for customer
         os_avgs, os_labels_avgs = self.get_endpoints_per_os(data)
-        endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels = self.tick_vals(min(os_avgs[os_avgs > 0]), max(os_avgs))
+        endpoint_avg_per_customer_tick_vals, endpoint_avg_per_customer_tick_labels = self.tick_vals(
+            min(os_avgs[os_avgs > 0]), max(os_avgs))
 
         # Average number of software instances per endpoint
         software_instances_avg_per_endpoint = self.get_avg_instance_per_endpoints(data)
@@ -638,7 +662,8 @@ class LMT_Statistics:
         file_uploader = self.create_upload()
 
         def generate_column_options(df):
-            available_columns = [{'label': col, 'value': col} for col in df.columns if col != 'data_collection_time' and col != 'lmt_server_install_time' and col != 'lmt_scanner_version_oldest' and col != 'lmt_server_version' and col != 'lmt_database_version' and col != 'lmt_database_type' and col != 'last_import_status']
+            available_columns = [{'label': col, 'value': col} for col in df.columns if
+                                 col != 'data_collection_time' and col != 'lmt_server_install_time' and col != 'lmt_scanner_version_oldest' and col != 'lmt_server_version' and col != 'lmt_database_version' and col != 'lmt_database_type' and col != 'last_import_status']
             return available_columns
 
         layout = html.Div([
@@ -779,34 +804,34 @@ class LMT_Statistics:
                     f"{software_instances_avg_per_endpoint:.3f}",
                     f"{endpoints_per_customer:.3f}"],
                     ["Average number of software instances per endpoint",
-                    "Average number of endpoints per customer"]
+                     "Average number of endpoints per customer"]
                 ),
 
-                self.dataTable(data),
+                self.data_table(data),
 
-                # html.Div(className='all-charts', children=[
-                #     html.Div([dcc.Graph(id=f'graph-{i}', figure=self.create_all_charts(data, column)) for i, column in enumerate(data.columns) if column != 'data_collection_time'])
-                # ])
+                # html.Div(className='all-charts', children=[ html.Div([dcc.Graph(id=f'graph-{i}',
+                # figure=self.create_all_charts(data, column)) for i, column in enumerate(data.columns) if column !=
+                # 'data_collection_time']) ])
 
                 html.Br(),
 
                 html.Div(className='file-uploader', children=[
                     file_uploader,
                     html.Button('Load file', id='refresh-button', n_clicks=0,
-                        style={
-                            'width': '20%',
-                            'height': '60px',
-                            'lineHeight': '60px',
-                            'borderWidth': '1px',
-                            'borderStyle': 'dashed',
-                            'borderRadius': '5px',
-                            'textAlign': 'center',
-                            'margin': '10px auto',
-                        }),
-                        
+                                style={
+                                    'width': '20%',
+                                    'height': '60px',
+                                    'lineHeight': '60px',
+                                    'borderWidth': '1px',
+                                    'borderStyle': 'dashed',
+                                    'borderRadius': '5px',
+                                    'textAlign': 'center',
+                                    'margin': '10px auto',
+                                }),
+
                     html.Div(id='refresh-div')
                 ])
- 
+
             ])
 
         ], className="dashboard"
@@ -843,7 +868,7 @@ class LMT_Statistics:
             tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]), max(os_breakdown))
 
         fig = px.bar(dt, x='OS', y='Endpoints')
-        
+
         fig.update_layout(
             hoverlabel=dict(
                 bgcolor="white",
@@ -908,7 +933,7 @@ class LMT_Statistics:
             hovertemplate='<b>%{y:}</b><extra></extra>')
 
         fig.update_layout(
-            title="Chart - "+selected_column,
+            title="Chart - " + selected_column,
             xaxis_title="Date",
             yaxis_title=selected_column,
             legend_title_text="",
@@ -993,9 +1018,11 @@ class LMT_Statistics:
         )
         def update_output(value, period_type):
             if value:
-                return self.barchart_endpoints_percentage(self.data, period_type), self.barchart_database_percentage(self.data, period_type)
+                return self.barchart_endpoints_percentage(self.data, period_type), self.barchart_database_percentage(
+                    self.data, period_type)
             else:
-                return self.barchart_endpoints_value(self.data, period_type), self.barchart_database_value(self.data, period_type)
+                return self.barchart_endpoints_value(self.data, period_type), self.barchart_database_value(self.data,
+                                                                                                           period_type)
 
         @callback(
             Output("output_data_upload", "children"),
@@ -1014,21 +1041,21 @@ class LMT_Statistics:
                         return
                     # save_data.to_csv(self.statistic_file, index=False)
                     self.web_layout = self.make_graphs(return_to_self=False)
-                    self.data = save_data         
+                    self.data = save_data
 
     def server_handle(self, _name: str = __name__, _debug: bool = False, assets_folder: str = "assets"):
         """
-        Runs a default dash server. Call after LMT_Statistics.init() method or set LMT_Statistics.web_layout 
-        to either LMT_Statistics.init() output or custom html layout.
+            Runs a default dash server. Call after LMT_Statistics.init() method or set LMT_Statistics.web_layout
+            to either LMT_Statistics.init() output or custom html layout.
 
-        :param _name: name of the app
-        :type _name: str
-        :param _debug: debug mode for dash app
-        :type _debug: bool
-        :param assets_folder: path to assets folder
-        :type assets_folder: str
-        """
-        if self.web_layout!=None:
+            :param _name: name of the app
+            :type _name: str
+            :param _debug: debug mode for dash app
+            :type _debug: bool
+            :param assets_folder: path to assets folder
+            :type assets_folder: str
+            """
+        if self.web_layout is not None:
             app = dash.Dash(name=_name, title="LMT Statistics", assets_folder=assets_folder)
             app.layout = self.web_layout
             return app.server
@@ -1036,7 +1063,6 @@ class LMT_Statistics:
             raise RuntimeError(
                 "LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before "
                 "LMT_Statistics.run_server()")
-     
 
     def overwrite_file(self):
         self.data.to_csv(self.statistic_file, index=False)
