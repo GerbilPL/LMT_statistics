@@ -7,7 +7,7 @@ import dash_daq as daq
 
 class LMT_Statistics:
     def __init__(self,
-                 statistic_file: str,
+                 statistic_file: str = "history.csv",
                  font_size: int = 24,
                  font_family: str = "IBM Plex Sans",
                  ):
@@ -26,6 +26,7 @@ class LMT_Statistics:
         self.font_size = font_size
         self.font_family = font_family
         self.data = self.import_data()
+        self.web_layout = None
 
     def import_data(self)->pd.DataFrame:
         """
@@ -112,7 +113,7 @@ class LMT_Statistics:
                 hoverlabel=layout_hoverlabel,
                 legend=layout_legend
             )
-        ) 
+        )
         if html_id != '':
             graph.__setattr__("id",html_id)
         div = html.Div([
@@ -599,6 +600,10 @@ class LMT_Statistics:
             x=1,
         )
 
+        # Make dictionary for both os breakdown and endpoints per os average
+        checkbox_os_breakdown = dict(zip(os_labels_breakdown, os_breakdown.axes[0]))
+        checkbox_os_avg = dict(zip(os_labels_avgs, os_avgs.axes[0]))
+
         layout = html.Div([
             html.Div(
                 className="full-screen",
@@ -678,9 +683,10 @@ class LMT_Statistics:
             
             dcc.Checklist(
                 id="breakdown-checklist",
-                options=[{'label': label, 'value': label} for label in os_breakdown.axes[0]],
+                options=[{'label': key, 'value': value} for key,value in checkbox_os_breakdown.items()],
                 value=os_breakdown.axes[0],
-                inline=True
+                inline=True,
+                labelStyle={'font-size': self.font_size, 'font-family': self.font_family, 'margin': '10px'}
             ),
 
             self.bar_chart(
@@ -697,9 +703,10 @@ class LMT_Statistics:
             
             dcc.Checklist(
                 id="average-checklist",
-                options=[{'label': label, 'value': label} for label in os_avgs.axes[0]],
+                options=[{'label': key, 'value': value} for key,value in checkbox_os_avg.items()],
                 value=os_avgs.axes[0],
-                inline=True
+                inline=True,
+                labelStyle={'font-size': self.font_size, 'font-family': self.font_family, 'margin': '10px'}
             ),
 
             self.bar_chart(
@@ -733,23 +740,17 @@ class LMT_Statistics:
             filtered_data = os_breakdown[selected_columns]
             filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
-                    'OS': filtered_data.axes[0], 
+                    'OS': filtered_data_labels, 
                     'Endpoints': filtered_data})
+            tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]),max(os_breakdown))
         else:
             os_breakdown, _ = self.get_endpoints_per_os(data)
             filtered_data = os_breakdown[selected_columns]
             filtered_data_labels = [col.replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc') for col in filtered_data.axes[0]]
             dt = pd.DataFrame({
-                    'OS': filtered_data.axes[0], 
+                    'OS': filtered_data_labels, 
                     'Endpoints': filtered_data})
-        # print(filtered_data_labels,filtered_data.axes[0])
-        labels = {}
-        for key in filtered_data.axes[0]:
-            for value in filtered_data_labels:
-                labels[key]=value
-                filtered_data_labels.remove(value)
-                break
-        # print(labels)
+            tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]),max(os_breakdown))
 
         fig = px.bar(dt,x='OS',y='Endpoints')
         fig.update_layout(
@@ -767,20 +768,28 @@ class LMT_Statistics:
                 xanchor="right",
                 x=1,
             ),
-            hovermode='x unified',
+            font=dict(
+                family="IBM Plex Sans",
+                size=24,
+                color="black"
+            ),
+            hovermode='x',
             yaxis_type='log',
             height=600,
         )
-        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y}</b><extra></extra>')
+        fig.update_traces(hoverinfo='y', hovertemplate='<b>%{y:}</b><extra></extra>')
+        fig.update_yaxes(tickvals=tick_values, ticktext=tick_labels)
         return fig
     
     def update_title(self, hdata):
-        # print(hdata)
         data = self.import_data()
         os_breakdown, _ = self.get_os_breakdown(data)
+        # print(os_breakdown.index)
+        os_breakdown.index = os_breakdown.index.str.replace('endpoints_os_','').str.replace('_',' ').str.capitalize().str.replace('Ibm','IBM').str.replace('Hpux','HP-UX').str.replace('sparc','Sparc')
         if hdata is not None:
+            # print(hdata)
             percentage = str(round(100*os_breakdown[hdata['points'][0]['x']]/os_breakdown.sum(),2))+'%'
-            return 'Breakdown of OS Endpoints - '+hdata['points'][0]['x'].replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hpux','HP-UX').replace('sparc','Sparc')+": "+percentage
+            return 'Breakdown of OS Endpoints - '+hdata['points'][0]['x'].replace('endpoints_os_','').replace('_',' ').capitalize().replace('Ibm','IBM').replace('Hp-ux','HP-UX').replace('sparc','Sparc')+": "+percentage
         else:
             return 'Breakdown of OS Endpoints'
 
@@ -818,7 +827,7 @@ class LMT_Statistics:
                 return self.barchart_endpoints_value(self.data), self.barchart_database_value(self.data)
 
 
-    def run_server(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
+    def server_handle(self, _name:str=__name__, _debug:bool=False, assets_folder:str="assets"):
         """
         Runs a default dash server. Call after LMT_Statistics.init() method or set LMT_Statistics.web_layout 
         to either LMT_Statistics.init() output or custom html layout.
@@ -830,10 +839,10 @@ class LMT_Statistics:
         :param assets_folder: path to assets folder
         :type assets_folder: str
         """
-        if hasattr(self, 'web_layout'):
+        if self.web_layout!=None:
             app = dash.Dash(name=_name, title="LMT Statistics", assets_folder=assets_folder)
             app.layout = self.web_layout
-            app.run_server(port=8080, debug=_debug)
+            return app.server
         else:
             raise RuntimeError("LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before LMT_Statistics.run_server()")
 
@@ -841,4 +850,4 @@ class LMT_Statistics:
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=False)
+    lmt.server_handle(_debug=False).run(port=8050)
