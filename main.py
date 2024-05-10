@@ -10,7 +10,7 @@ import dash_daq as daq
 
 class LMT_Statistics:
     def __init__(self,
-                 statistic_file: str,
+                 statistic_file: str = "history.csv",
                  font_size: int = 24,
                  font_family: str = "IBM Plex Sans",
                  ):
@@ -30,6 +30,7 @@ class LMT_Statistics:
         self.font_size = font_size
         self.font_family = font_family
         self.data = self.import_data()
+        self.web_layout = None
 
     def import_data(self) -> pd.DataFrame:
         """
@@ -842,6 +843,7 @@ class LMT_Statistics:
             tick_values, tick_labels = self.tick_vals(min(os_breakdown[os_breakdown > 0]), max(os_breakdown))
 
         fig = px.bar(dt, x='OS', y='Endpoints')
+        
         fig.update_layout(
             hoverlabel=dict(
                 bgcolor="white",
@@ -946,7 +948,6 @@ class LMT_Statistics:
             if n_clicks:
                 return dcc.Location(href='/', id='id')
 
-
         @callback(
             Output('graph-1', 'figure'),
             [Input('column-dropdown-1', 'value'),
@@ -1015,7 +1016,7 @@ class LMT_Statistics:
                     self.web_layout = self.make_graphs(return_to_self=False)
                     self.data = save_data         
 
-    def run_server(self, _name: str = __name__, _debug: bool = False, assets_folder: str = "assets"):
+    def server_handle(self, _name: str = __name__, _debug: bool = False, assets_folder: str = "assets"):
         """
         Runs a default dash server. Call after LMT_Statistics.init() method or set LMT_Statistics.web_layout 
         to either LMT_Statistics.init() output or custom html layout.
@@ -1027,10 +1028,10 @@ class LMT_Statistics:
         :param assets_folder: path to assets folder
         :type assets_folder: str
         """
-        if hasattr(self, 'web_layout'):
+        if self.web_layout!=None:
             app = dash.Dash(name=_name, title="LMT Statistics", assets_folder=assets_folder)
             app.layout = self.web_layout
-            app.run_server(port=8080, debug=_debug)
+            return app.server
         else:
             raise RuntimeError(
                 "LMT_Statistics.init() must be called or LMT_Statistics.web_layout must be set before "
@@ -1051,5 +1052,5 @@ def format_xaxis(period_type, dates):
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.run_server(_debug=True)
+    lmt.server_handle(_debug=False).run(port=8050)
     lmt.overwrite_file()
