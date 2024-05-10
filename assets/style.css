@@ -90,6 +90,7 @@ html, body{
     margin: 0;
     padding: 0;
     scroll-behavior: smooth;
+    overflow-y: hidden;
 }
 
 .card-container{
@@ -97,6 +98,7 @@ html, body{
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    margin: 50px auto;
 }
 .card-body{
     width: fit-content;
@@ -168,7 +170,7 @@ h2{
 
 #graph-database-type-over-time, #graph-endpoints-over-time{
     /* background-color: var(--secondary-color); */
-    width: 80%;
+    width: 100%;
     margin: 50px auto;
 }
 
@@ -180,21 +182,26 @@ h2{
     width: 12.5%;
     justify-content: center;
     text-align: center;
-    margin: 20px auto -25px auto;
+    margin: -30px auto 100px auto;
 }
 
 #graph-os-endpoint-breakdown{
-    width: 80%;
+    width: 100%;
     margin: auto;
 }
 
 #graph-endpoints-per-os-avg{
-    width: 80%;
+    width: 100%;
     margin: auto;
 }
 
+#endpoints-chart-title, #chart-title{
+    width: 100%;
+    margin: 100px auto -50px;
+}
+
 #breakdown-checklist, #average-checklist{
-    width: 50%;
+    width: 80%;
     margin: auto;
     text-align: center;
 }
@@ -231,11 +238,11 @@ h2{
     max-height: 100vh;
 } */
 
-.content{
+/* .content{
     max-width: 800px;
     margin: 20px auto;
     text-align: center;
-}
+} */
 
 .btn{
     padding: 10px 20px;
@@ -256,8 +263,8 @@ h2{
     background-color: var(--background-color);
     /* background-color: var(--primary-color); */
     padding: 20px;
-    margin-bottom: 50px;
     position: sticky;
+    height: 7.5vh;
 }
   
 .logo{
@@ -316,8 +323,6 @@ h2{
     min-height: 10px;
     width: 35px;
     text-align: center;
-    
-    
 }
 
 .goto-top a{
@@ -334,10 +339,68 @@ h2{
 }
 
 ::-webkit-scrollbar-thumb{
-    background: lightgray; 
+    background: lightgray;
     border-radius: 10px;
 }
   
 ::-webkit-scrollbar-thumb:hover{
     background: rgb(186, 185, 185);
+}
+
+.two-columns, .toggle-output{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.all-charts{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    height: 600px;
+    width: 100%;
+    overflow-y: scroll;
+}
+
+/* .two-columns div{
+    padding: 20px;
+    text-align: center;
+} */
+
+#column-dropdown-1, #column-dropdown-2{
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+#period-selector{
+    width: 7%;
+    margin: 50px auto 30px 20px;
+}
+
+#main-content{
+    height: 92.5vh;
+    overflow-y: scroll;
+    scroll-behavior: smooth;
+    box-shadow: 0px -10px 5px rgba(0, 0, 0, 0.1);
+}
+
+.file-uploader{
+    padding-top: 50px;
+    padding-bottom: 50px;
+    width: 100%;
+    background-color: var(--background-color);
+    text-align: center;
+    cursor: pointer;
+}
+
+#refresh-button{
+    background-color: var(--ibm-blue-80);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
 }
