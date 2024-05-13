@@ -27,9 +27,12 @@ class LMT_Statistics:
             """
         self.web_layout = None
         self.statistic_file = statistic_file
+        self.uploaded = False
         self.font_size = font_size
         self.font_family = font_family
         self.data = self.import_data()
+        self.card_element = self.card()
+        self.data_table_element = self.data_table()
         self.web_layout = None
 
     def import_data(self) -> pd.DataFrame:
@@ -40,7 +43,10 @@ class LMT_Statistics:
             :rtype: pd.DataFrame
             """
 
-        data = pd.read_csv(self.statistic_file)
+        if not self.uploaded:
+            data = pd.read_csv(self.statistic_file)
+        else:
+            data = self.data
         data['data_collection_time'] = pd.to_datetime(data['data_collection_time'])
         return data
 
@@ -133,12 +139,10 @@ class LMT_Statistics:
         ])
         return div
 
-    @staticmethod
-    def data_table(_df: pd.DataFrame) -> html.Div:
+    def data_table(self) -> html.Div:
         """
             Generates a div with a dataTable based on specified parameters
 
-            :param _df: DataFrame
             :return: A Dash HTML div containing the dataTable
             :rtype: html.Div
             """
@@ -146,9 +150,9 @@ class LMT_Statistics:
             dash_table.DataTable(
                 id='datatable-interactivity',
                 columns=[
-                    {"name": i, "id": i} for i in _df.columns
+                    {"name": i, "id": i} for i in self.data.columns
                 ],
-                data=_df.to_dict('records'),
+                data=self.data.to_dict('records'),
                 sort_action="native",
                 sort_mode="multi",
                 page_action="native",
@@ -230,23 +234,59 @@ class LMT_Statistics:
             legend=layout_legend
         )
 
-    def card(self, _data: list, _labels: list) -> html.Div:
+    def card(self) -> html.Div:
         """
             Generates a div with a card based on specified parameters
 
-            :param _data: list of values
-            :type _data: list
-            :param _labels: list of labels
-            :type _labels: list
             :return: div with a bar chart
             :rtype: html.Div
             """
+        _data = self.calculate_card()
+        _labels = ["Average number of software instances per endpoint", "Average number of endpoints per customer"]
         div = html.Div([
-            html.Div([html.H3([l], className="card-title"), html.Span([str(d)], className="card-text")]
+            html.Div([html.H3([l], className="card-title"), html.Span([f"{d:.3f}"], className="card-text")]
                      , className="card-body")
             for l, d in zip(_labels, _data)
         ], className="card-container")
         return div
+
+    def calculate_card(self):
+        """
+            Calculates the average number of software instances per endpoint and the average number of endpoints per customer.
+            :return: tuple of average number of software instances per endpoint and average number of endpoints per customer
+            :rtype: tuple
+        """
+        # only to mitigate the bug with loading new data
+        software_instances_avg_per_endpoint = self.get_avg_instance_per_endpoints()
+        endpoints_per_customer = self.get_avg_endpoints_per_customer()
+        return software_instances_avg_per_endpoint, endpoints_per_customer
+
+    def change_cards(self):
+        """
+            Updates the card values.
+
+            :return: None
+        """
+        values = self.calculate_card()
+        self.card_element.children[0].children[1].children = f"{values[0]:.3f}"
+        self.card_element.children[1].children[1].children = f"{values[1]:.3f}"
+
+    def change_datatable(self) -> None:
+        temp_element =  html.Div([
+            dash_table.DataTable(
+                id='datatable-interactivity',
+                columns=[
+                    {"name": i, "id": i} for i in self.data.columns
+                ],
+                data=self.data.to_dict('records'),
+                sort_action="native",
+                sort_mode="multi",
+                page_action="native",
+                page_current=0,
+                page_size=10,
+                style_table={'overflowX': 'scroll'},
+            )])
+        self.data_table_element.children = temp_element.children
 
     @staticmethod
     def barchart_endpoints_percentage(_df, period_type):
@@ -536,8 +576,7 @@ class LMT_Statistics:
                 'sparc', 'Sparc') for col in os_avgs.axes[0]]
         return os_avgs, os_labels
 
-    @staticmethod
-    def get_avg_instance_per_endpoints(_df: pd.DataFrame) -> float:
+    def get_avg_instance_per_endpoints(self) -> float:
         """
             Returns average number of instances per endpoint.
 
@@ -546,13 +585,12 @@ class LMT_Statistics:
             :return: average number of instances per endpoint
             :rtype: float
             """
-        endpoints_all = _df['endpoints_all'].sum()
-        instances_all = _df['instances_all'].sum()
+        endpoints_all = self.data['endpoints_all'].sum()
+        instances_all = self.data['instances_all'].sum()
         avg = (instances_all / endpoints_all)
         return avg
 
-    @staticmethod
-    def get_avg_endpoints_per_customer(_df: pd.DataFrame) -> float:
+    def get_avg_endpoints_per_customer(self) -> float:
         """
             Returns average number of endpoints per customer (or data length).
 
@@ -561,8 +599,8 @@ class LMT_Statistics:
             :return: average number of endpoints per customer
             :rtype: float
             """
-        endpoints_all = _df['endpoints_all'].sum()
-        avg = (endpoints_all / len(_df))
+        endpoints_all = self.data['endpoints_all'].sum()
+        avg = (endpoints_all / len(self.data))
         return avg
 
     @staticmethod
@@ -628,11 +666,14 @@ class LMT_Statistics:
             min(os_avgs[os_avgs > 0]), max(os_avgs))
 
         # Average number of software instances per endpoint
-        software_instances_avg_per_endpoint = self.get_avg_instance_per_endpoints(data)
+        # it doesn't change value as of now after update
+        software_instances_avg_per_endpoint = self.get_avg_instance_per_endpoints()
 
         # Average number of endpoints per customer
-        endpoints_per_customer = self.get_avg_endpoints_per_customer(data)
+        # it doesn't change value as of now after update
+        endpoints_per_customer = self.get_avg_endpoints_per_customer()
 
+        card = self.card()
         traces = dict(
             hoverinfo='all',
             hovertemplate='<b>%{y:.2%}</b><extra></extra>'
@@ -771,7 +812,21 @@ class LMT_Statistics:
                             "", True, 'OS', 'Endpoints',
                             {'index': 'OS', 'y': 'Endpoints'},
                             os_endpoint_breakdown_tick_vals, os_endpoint_breakdown_tick_labels,
-                            layout_hoverlabel=hoverlabel, layout_legend=legend, _text_auto='',
+                            layout_hoverlabel=dict(
+                                bgcolor="white",
+                                font_size=self.font_size,
+                                font_family=self.font_family,
+                                font_color="black",
+                                bordercolor="black",
+                            ),
+                            layout_legend=dict(
+                                orientation="h",
+                                yanchor="bottom",
+                                y=1.02,
+                                xanchor="right",
+                                x=1,
+                            ),
+                            _text_auto=False,
                             html_id='graph-os-endpoint-breakdown'
                         ),
                     ]),
@@ -800,14 +855,9 @@ class LMT_Statistics:
                     ]),
                 ]),
 
-                self.card([
-                    f"{software_instances_avg_per_endpoint:.3f}",
-                    f"{endpoints_per_customer:.3f}"],
-                    ["Average number of software instances per endpoint",
-                     "Average number of endpoints per customer"]
-                ),
+                self.card_element,
 
-                self.data_table(data),
+                self.data_table_element,
 
                 # html.Div(className='all-charts', children=[ html.Div([dcc.Graph(id=f'graph-{i}',
                 # figure=self.create_all_charts(data, column)) for i, column in enumerate(data.columns) if column !=
@@ -1040,8 +1090,13 @@ class LMT_Statistics:
                     if 'data_collection_time' not in save_data.columns and len(save_data.columns) != 46:
                         return
                     # save_data.to_csv(self.statistic_file, index=False)
-                    self.web_layout = self.make_graphs(return_to_self=False)
                     self.data = save_data
+                    self.change_cards()
+                    self.change_datatable()
+                    self.web_layout = self.make_graphs(return_to_self=False)
+                    # a bit of brute force to update the layout
+                    # necessary evil for now :)
+                    self.uploaded = True
 
     def server_handle(self, _name: str = __name__, _debug: bool = False, assets_folder: str = "assets"):
         """
@@ -1078,5 +1133,5 @@ def format_xaxis(period_type, dates):
 if __name__ == '__main__':
     lmt = LMT_Statistics("history.csv")
     lmt.make_graphs(return_to_self=True)
-    lmt.server_handle(_debug=False).run(port=8050)
+    lmt.server_handle(_debug=False).run(port=8050, debug=True)
     lmt.overwrite_file()
