@@ -36,6 +36,6 @@ You can generate more data to your csv file by using [ILMT Generator](https://gi
 The answer to that question lies in the code. It is roughly documented inside the python script. For more information you can start a discussion on GitHub.
 
 ### Main contributors :)
-- [Marek Chachlica](https://github.com/MarekChachlica)
-- [Gabriel Pilch](https://github.com/GabrielPilch)
-- [Szymon Skrzypczyk](https://github.com/SzymonSkrzypczyk)
+- [Marek53482](https://github.com/Marek53482)
+- [GerbilPL](https://github.com/GerbilPL)
+- [SzymonSkrzypczyk](https://github.com/SzymonSkrzypczyk)
